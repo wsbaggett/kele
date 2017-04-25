@@ -35,6 +35,43 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     JSON.parse(response.body)
   end
 
+  def get_messages(*page_num)
+    puts "Start of Get_messages"
+
+    page = page_num[0].to_i
+    values = {
+    "page": page
+    }
+
+    if page == nil
+      response = self.class.get(base_url("message_threads"), headers: get_header)
+    else
+      response = self.class.get(base_url("message_threads"), values: values, headers: get_header)
+    end
+    raise "Invalid get messages error" if response.code != 200
+    JSON.parse(response.body)
+  end
+
+  def create_message(sender, recipient_id, token, subject, text)
+    puts "Start of Create_message"
+
+    values = {
+    "sender": sender,
+    "recipient_id": recipient_id.to_i,
+    "token": token,
+    "subject": subject,
+    "stripped-text": text
+    }
+
+    # The create_message will not work on the Production server URL due to it being a student account as per the Bloc Slack channel.
+    # response = self.class.post(base_url("messages"), values: values, headers: get_header)
+
+    # Does work on the mock server URL below
+    response = self.class.post('https://private-anon-a16d2c6b9c-blocapi.apiary-mock.com/api/v1/messages', values: values, headers: get_header)
+    raise "Error creating message" if response.code != 200
+    puts response.body
+  end
+
   private
 
   def base_url(tag)
