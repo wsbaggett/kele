@@ -63,6 +63,8 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     "stripped-text": text
     }
 
+    puts "Values = #{values}"
+
     # The create_message will not work on the Production server URL due to it being a student account as per the Bloc Slack channel.
     # response = self.class.post(base_url("messages"), values: values, headers: get_header)
 
@@ -70,6 +72,42 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     response = self.class.post('https://private-anon-a16d2c6b9c-blocapi.apiary-mock.com/api/v1/messages', values: values, headers: get_header)
     raise "Error creating message" if response.code != 200
     puts response.body
+  end
+
+  def create_submission(checkpoint_id, assignment_branch, assignment_commit_link, comment)
+    puts "Start of create submission"
+
+    enrollment_id = @my_info["current_enrollment"]["id"]
+
+    values = {
+    "assignment_branch": assignment_branch,
+    "assignment_commit_link": assignment_commit_link,
+    "checkpoint_id": checkpoint_id,
+    "comment": comment,
+    "enrollment_id": enrollment_id
+    }
+
+    response = self.class.post(base_url("checkpoint_submissions"), values: values, headers: get_header)
+    raise "Error creating checkpoint" if response.code != 200
+    JSON.parse(response.body)
+  end
+
+  def update_submission(submission_id, checkpoint_id, assignment_branch, assignment_commit_link, comment)
+    puts "Start of update submission"
+
+    enrollment_id = @my_info["current_enrollment"]["id"]
+
+    values = {
+    "assignment_branch": assignment_branch,
+    "assignment_commit_link": assignment_commit_link,
+    "checkpoint_id": checkpoint_id,
+    "comment": comment,
+    "enrollment_id": enrollment_id
+    }
+
+    response = self.class.put(base_url("checkpoint_submissions/#{submission_id}"), values: values, headers: get_header)
+    raise "Error updating checkpoint" if response.code != 200
+    JSON.parse(response.body)
   end
 
   private
