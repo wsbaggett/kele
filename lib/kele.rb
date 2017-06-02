@@ -52,26 +52,29 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     JSON.parse(response.body)
   end
 
-  def create_message(sender, recipient_id, token, subject, text)
+  def create_message(sender, recipient_id, token=nil, subject, text)
     puts "Start of Create_message"
 
     values = {
     "sender": sender,
-    "recipient_id": recipient_id.to_i,
-    "token": token,
+    "recipient_id": recipient_id.to_s,
     "subject": subject,
     "stripped-text": text
     }
-
+    #values["token"] = token unless token.nil?
     puts "Values = #{values}"
 
     # The create_message will not work on the Production server URL due to it being a student account as per the Bloc Slack channel.
-    # response = self.class.post(base_url("messages"), values: values, headers: get_header)
+    puts "Headers = #{get_header}"
+    response = self.class.post(base_url("messages"), values: values, headers: get_header)
+
 
     # Does work on the mock server URL below
-    response = self.class.post('https://private-anon-a16d2c6b9c-blocapi.apiary-mock.com/api/v1/messages', values: values, headers: get_header)
-    raise "Error creating message" if response.code != 200
+    #response = self.class.post('https://private-anon-63f1bab3b7-blocapi.apiary-mock.com/api/v1/messages', values: values, headers: get_header)
+    puts response.code
     puts response.body
+    raise "Error creating message" if response.code != 200
+
   end
 
   def create_submission(checkpoint_id, assignment_branch, assignment_commit_link, comment)
@@ -124,3 +127,8 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
   end
 
 end
+
+#mentor_id = 2302437
+#checkpoint_id = 2160
+#roadmap_id = 37
+#checkpoint_id = 2160
