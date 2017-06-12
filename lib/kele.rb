@@ -1,6 +1,6 @@
 require 'httparty'
 require 'json'
-require '/Users/baggetws/bloc/kele/lib/roadmap'
+require './lib/roadmap'
 
  class Kele
   include HTTParty
@@ -15,7 +15,7 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     }
 
     response = self.class.post(base_url("sessions"), body: values)
-    raise "Invalid email or password" if response.code != 200
+    raise "Invalid email or password, error code: #{response.code}" if response.code != 200
     @author_token = response["auth_token"]
   end
 
@@ -23,7 +23,7 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     puts "Start of Get_me!"
 
    response = self.class.get(base_url("users/me"), headers: get_header)
-   raise "Invalid user info" if response.code != 200
+   raise "Invalid user info, error code: #{response.code}" if response.code != 200
    @my_info = JSON.parse(response.body)
   end
 
@@ -31,7 +31,7 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     puts "Start of Get_mentor_availability"
 
     response = self.class.get(base_url("mentors/#{mentor_id}/student_availability"), headers: get_header)
-    raise "Invalid mentor info" if response.code != 200
+    raise "Invalid mentor info, error code: #{response.code}" if response.code != 200
     JSON.parse(response.body)
   end
 
@@ -43,12 +43,14 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     "page": page
     }
 
+    puts "Page number #{page}"
+
     if page == nil
       response = self.class.get(base_url("message_threads"), headers: get_header)
     else
       response = self.class.get(base_url("message_threads"), values: values, headers: get_header)
     end
-    raise "Invalid get messages error" if response.code != 200
+    raise "Invalid get messages error, error code: #{response.code}" if response.code != 200
     JSON.parse(response.body)
   end
 
@@ -61,19 +63,19 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     "subject": subject,
     "stripped-text": text
     }
-    #values["token"] = token unless token.nil?
+    values["token"] = token unless token.nil?
     puts "Values = #{values}"
 
     # The create_message will not work on the Production server URL due to it being a student account as per the Bloc Slack channel.
-    puts "Headers = #{get_header}"
+    #puts "Headers = #{get_header}"
     response = self.class.post(base_url("messages"), values: values, headers: get_header)
 
 
     # Does work on the mock server URL below
     #response = self.class.post('https://private-anon-63f1bab3b7-blocapi.apiary-mock.com/api/v1/messages', values: values, headers: get_header)
-    puts response.code
+    #puts response.code
     puts response.body
-    raise "Error creating message" if response.code != 200
+    raise "Error creating message, error code: #{response.code}" if response.code != 200
 
   end
 
@@ -91,7 +93,7 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     }
 
     response = self.class.post(base_url("checkpoint_submissions"), values: values, headers: get_header)
-    raise "Error creating checkpoint" if response.code != 200
+    raise "Error creating checkpoint, error code: #{response.code}" if response.code != 200
     JSON.parse(response.body)
   end
 
@@ -109,7 +111,7 @@ require '/Users/baggetws/bloc/kele/lib/roadmap'
     }
 
     response = self.class.put(base_url("checkpoint_submissions/#{submission_id}"), values: values, headers: get_header)
-    raise "Error updating checkpoint" if response.code != 200
+    raise "Error updating checkpoint, error code: #{response.code}" if response.code != 200
     JSON.parse(response.body)
   end
 
